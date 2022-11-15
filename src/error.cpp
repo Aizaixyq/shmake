@@ -1,20 +1,23 @@
 #include "error.hpp"
-#include <fmt/core.h>
+#include <cstdio>
+#include <stdlib.h>
 
 int error(int status) {
     if (status == -1 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+        system("printf \"\\e[31m\"");
         if (status == -1)
-            fmt::print("system error!\n");
+            printf("system error!\n");
 
         else if (WIFEXITED(status))
-            fmt::print("exit status = {}\n", WEXITSTATUS(status));
+            printf("exit status = %d\n", WEXITSTATUS(status));
 
         else if (WEXITSTATUS(status) != 0)
-            fmt::print("run shell script fail, script exit code: {}\n",
+            printf("run shell script fail, script exit code: %d\n",
                        WEXITSTATUS(status));
 
-        fmt::print("run error: [{}] [{}] [{}]\n", status, WIFEXITED(status),
+        printf("run error: [0x%x] [%d] [%d]\n", status, WIFEXITED(status),
                    WEXITSTATUS(status));
+        system("printf \"\\e[0m\"");
         return 0;
     }
     return 1;

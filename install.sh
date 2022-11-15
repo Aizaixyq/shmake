@@ -1,6 +1,6 @@
 #!/bin/sh
 
-g++ ./src/*.cpp -o shmake `pkg-config --libs --cflags fmt`
+g++ ./src/*.cpp -o shmake
 
 if [ -d ~/.shmake ] 
 then 

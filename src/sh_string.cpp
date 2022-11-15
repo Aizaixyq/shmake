@@ -1,6 +1,5 @@
 #include "sh_string.hpp"
 #include <string>
-#include <fmt/core.h>
 
 void newsh_fun(std::string &x){
     std::string newsh = R"(sources=()
@@ -12,11 +11,11 @@ compiler="g++"
 }
 
 void show_version(){
-    system("printf \"shmake version: \\e[35m0.43.9\\e[0m\n\"");
+    system("printf \"shmake version: \\e[35m0.43.10\\e[0m\n\"");
 }
 
 void print_help(){
-    const std::string help = R"(shmake version: 0.43.9
+    const std::string help = R"(shmake version: 0.43.10
 
 Usage: $\e[36mshmake [Actions] [options] [target]\e[0m
 

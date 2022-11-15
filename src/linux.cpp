@@ -3,7 +3,7 @@
 #include "sh_string.hpp"
 #include "linux.hpp"
 #include <cstdio>
-#include <fmt/core.h>
+#include <cstring>
 #include <fstream>
 
 int linux_start(int argc, char *argv[]) {
@@ -19,7 +19,7 @@ int linux_start(int argc, char *argv[]) {
             std::fstream create_sh;
             create_sh.open("sh.sh", std::ios::out);
             if (!create_sh) {
-                fmt::print("create new sh.sh error");
+                system("printf \"\\e[31mcreate new sh.sh error\\e[0m\"");
                 return 1;
             }
 

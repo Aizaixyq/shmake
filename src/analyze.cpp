@@ -4,7 +4,6 @@
 #include "shmake.hpp"
 #include <cctype>
 #include <cstring>
-#include <fmt/core.h>
 #include <string>
 
 extern int jobs;
@@ -54,7 +53,7 @@ int analyze(int argc, char *argv[]) {
                 ++i;
             }
             else
-                fmt::print("-j: invalid number\n");
+                printf("-j: invalid number\n");
         } 
         
         else if (!strcmp(argv[i], "target")) {
@@ -63,7 +62,7 @@ int analyze(int argc, char *argv[]) {
                 ++i;
             }
             else {
-                fmt::print("target: name not entered! use default\n");
+                printf("target: name not entered! use default\n");
             }
         } 
         
@@ -73,7 +72,7 @@ int analyze(int argc, char *argv[]) {
                 continue;
             }
             print_help();
-            fmt::print("Invalid arg or path: {}\n", argv[i]);
+            printf("Invalid arg or path: %s\n", argv[i]);
             return 0;
         }
     }
