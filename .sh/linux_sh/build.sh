@@ -53,7 +53,20 @@ do
         && ( echo "before_build() found." > ./rec/before_build.txt && before_build ) \
         || echo "before_build() not found." > ./rec/before_build.txt 
 
-    
+    i=${#build}
+    ix=0
+    while(( $i>=0 ))
+    do
+        s=${build:${i}:1}
+        if [[ $s = "/" ]]
+        then
+            ix=`expr ${i} + 1`
+            break
+        fi
+        let "i--"
+    done
+    build_time=${build:${ix}}
+
     all_include=""
     for src in ${includedir[@]}
     do
@@ -107,7 +120,17 @@ do
                     fi
                     echo `stat --format=%y ${scc}` >> ./Shfile/time/${src:${idex}}${idex}com.txt
                 done
-                if [[ $(cat ./Shfile/time/${src:${idex}}${idex}com.txt) != $(cat ./Shfile/time/${src:${idex}}${idex}.txt) ]]
+
+                if [ -f ./rec/${build_time}.txt ]
+                then
+                    echo `stat --format=%y $build` > ./rec/${build_time}com.txt
+                else
+                    echo `stat --format=%y $build` > ./rec/${build_time}com.txt
+                    echo `stat --format=%y $build` > ./rec/${build_time}.txt
+                fi
+
+                if [[ $(cat ./Shfile/time/${src:${idex}}${idex}com.txt) != $(cat ./Shfile/time/${src:${idex}}${idex}.txt) ]] || \
+                        [[ $(cat ./rec/${build_time}com.txt) != $(cat ./rec/${build_time}.txt) ]]
                 then
                     echo -e "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
                     ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
@@ -116,8 +139,8 @@ do
                     let "cnt++"
                 fi
 
-                rm ./Shfile/time/${src:${idex}}${idex}.txt
-                mv ./Shfile/time/${src:${idex}}${idex}com.txt ./Shfile/time/${src:${idex}}${idex}.txt 
+                mv -f ./rec/${build_time}com.txt ./rec/${build_time}.txt
+                mv -f ./Shfile/time/${src:${idex}}${idex}com.txt ./Shfile/time/${src:${idex}}${idex}.txt 
         
             else
                 echo -e "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
@@ -205,6 +228,8 @@ do
             `pkg-config --libs --cflags ${deps[*]}` \
             && echo -e "\e[32mBuilding completed\e[0m" || exit 1
     fi
+
+    echo `stat --format=%y $build` > ./rec/$build_time.txt
 
     type after_build &> ./rec/after_build.txt \
         && ( echo "after_build() found." > ./rec/after_build.txt && after_build ) \
