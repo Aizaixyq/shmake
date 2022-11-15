@@ -174,12 +174,11 @@ do
                 && mkdir Shfile/time 
         fi
         rm ./rec/${build_time}.txt
-        
+
         cnt=1
 
         for src in $src_
         do 
-
 
             int=${#src}
             idex=0
