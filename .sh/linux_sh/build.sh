@@ -84,13 +84,15 @@ do
         echo `stat --format=%y $build` > ./rec/${build_time}com.txt
     else
         echo `stat --format=%y $build` > ./rec/${build_time}com.txt
+        echo "11" >> ./rec/${build_time}com.txt
         echo `stat --format=%y $build` > ./rec/${build_time}.txt
     fi
 
     if [[ -d ./Shfile ]] && [[ $rebuild = "n" ]] && \
-        [[ $(cat ./rec/${build_time}com.txt) = $(./rec/${build_time}.txt) ]]
+        [[ $(cat ./rec/${build_time}com.txt) = $(cat ./rec/${build_time}.txt) ]]
     then 
-
+        rm ./rec/${build_time}.txt
+        mv -f ./rec/${build_time}com.txt ./rec/${build_time}.txt
         all_o=""
         cnt=1
 
@@ -139,9 +141,7 @@ do
                     let "cnt++"
                 fi
 
-                rm ./rec/${build_time}.txt 
                 rm ./Shfile/time/${src:${idex}}${idex}.txt 
-                mv -f ./rec/${build_time}com.txt ./rec/${build_time}.txt
                 mv -f ./Shfile/time/${src:${idex}}${idex}com.txt ./Shfile/time/${src:${idex}}${idex}.txt 
         
             else
@@ -167,13 +167,13 @@ do
             `pkg-config --libs --cflags ${deps[*]}` \
             && echo -e "\e[32mBuilding completed\e[0m" || exit 1
     else
-
+        rm ./rec/${build_time}.txt
+        mv -f ./rec/${build_time}com.txt ./rec/${build_time}.txt
         if [[ ! -d ./Shfile ]]
         then
             mkdir Shfile && mkdir Shfile/.d && mkdir Shfile/.o \
                 && mkdir Shfile/time 
         fi
-        rm ./rec/${build_time}.txt
 
         cnt=1
 
@@ -192,10 +192,6 @@ do
                 fi
                 let "int--"
             done
-            if [[ -f ./Shfile/time/${src:${idex}}${idex}.txt ]]
-            then 
-                rm ./Shfile/time/${src:${idex}}${idex}.txt
-            fi
 
             echo -e "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
             ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
@@ -235,8 +231,6 @@ do
         ${compiler} ${all_o} -o ${project[0]} \
             `pkg-config --libs --cflags ${deps[*]}` \
             && echo -e "\e[32mBuilding completed\e[0m" || exit 1
-
-        echo `stat --format=%y $build` > ./rec/$build_time.txt
     fi
 
 
