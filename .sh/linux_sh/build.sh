@@ -78,8 +78,17 @@ do
     do  
         src_="$src_ `ls ${build_file_path}/$s`"
     done
-        
-    if [[ -d ./Shfile ]] && [[ $rebuild = "n" ]]
+
+    if [ -f ./rec/${build_time}.txt ]
+    then
+        echo `stat --format=%y $build` > ./rec/${build_time}com.txt
+    else
+        echo `stat --format=%y $build` > ./rec/${build_time}com.txt
+        echo `stat --format=%y $build` > ./rec/${build_time}.txt
+    fi
+
+    if [[ -d ./Shfile ]] && [[ $rebuild = "n" ]] && \
+        [[ $(cat ./rec/${build_time}com.txt) = $(./rec/${build_time}.txt) ]]
     then 
 
         all_o=""
@@ -121,16 +130,7 @@ do
                     echo `stat --format=%y ${scc}` >> ./Shfile/time/${src:${idex}}${idex}com.txt
                 done
 
-                if [ -f ./rec/${build_time}.txt ]
-                then
-                    echo `stat --format=%y $build` > ./rec/${build_time}com.txt
-                else
-                    echo `stat --format=%y $build` > ./rec/${build_time}com.txt
-                    echo `stat --format=%y $build` > ./rec/${build_time}.txt
-                fi
-
-                if [[ $(cat ./Shfile/time/${src:${idex}}${idex}com.txt) != $(cat ./Shfile/time/${src:${idex}}${idex}.txt) ]] || \
-                        [[ $(cat ./rec/${build_time}com.txt) != $(cat ./rec/${build_time}.txt) ]]
+                if [[ $(cat ./Shfile/time/${src:${idex}}${idex}com.txt) != $(cat ./Shfile/time/${src:${idex}}${idex}.txt) ]]
                 then
                     echo -e "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
                     ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
@@ -139,6 +139,8 @@ do
                     let "cnt++"
                 fi
 
+                rm ./rec/${build_time}.txt 
+                rm ./Shfile/time/${src:${idex}}${idex}.txt 
                 mv -f ./rec/${build_time}com.txt ./rec/${build_time}.txt
                 mv -f ./Shfile/time/${src:${idex}}${idex}com.txt ./Shfile/time/${src:${idex}}${idex}.txt 
         
@@ -168,14 +170,17 @@ do
 
         if [[ ! -d ./Shfile ]]
         then
-        mkdir Shfile && mkdir Shfile/.d && mkdir Shfile/.o \
-            && mkdir Shfile/time 
+            mkdir Shfile && mkdir Shfile/.d && mkdir Shfile/.o \
+                && mkdir Shfile/time 
         fi
-
+        rm ./rec/${build_time}.txt
+        
         cnt=1
 
         for src in $src_
         do 
+
+
             int=${#src}
             idex=0
             while(( $int>=0 ))
@@ -188,6 +193,10 @@ do
                 fi
                 let "int--"
             done
+            if [[ -f ./Shfile/time/${src:${idex}}${idex}.txt ]]
+            then 
+                rm ./Shfile/time/${src:${idex}}${idex}.txt
+            fi
 
             echo -e "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
             ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
@@ -227,9 +236,10 @@ do
         ${compiler} ${all_o} -o ${project[0]} \
             `pkg-config --libs --cflags ${deps[*]}` \
             && echo -e "\e[32mBuilding completed\e[0m" || exit 1
+
+        echo `stat --format=%y $build` > ./rec/$build_time.txt
     fi
 
-    echo `stat --format=%y $build` > ./rec/$build_time.txt
 
     type after_build &> ./rec/after_build.txt \
         && ( echo "after_build() found." > ./rec/after_build.txt && after_build ) \
