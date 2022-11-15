@@ -1,4 +1,3 @@
-build/rec
-build/Shfile
+build/
 shmake
 .vscode
