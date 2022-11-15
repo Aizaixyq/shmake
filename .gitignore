@@ -1,4 +1,4 @@
 build/rec
 build/Shfile
-build/shmake
+shmake
 .vscode
