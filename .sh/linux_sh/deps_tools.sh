@@ -1,9 +1,9 @@
 system_idebtify(){
     a=`uname  -a`
 
-    b="arch"
-    c="centos"
-    d="ubuntu"
+    b="Arch"
+    c="Centos"
+    d="Ubuntu"
     ret=0
 
     if [[ $a =~ $b ]];then
@@ -27,11 +27,11 @@ install_compiler(){
     echo "Try to install the compiler: $1"
     system_idebtify
     p=$?
-    if (( $p=1 ));then
+    if (( $p==1 ));then
         pacman -S $_compiler || echo "install failure"
-    elif (( $p=2 ));then
+    elif (( $p==2 ));then
         yum -y install $_compiler || echo "install failure"
-    elif (( $p=3 ));then 
+    elif (( $p==3 ));then 
         sudo apt install gcc -y || echo "install failure"
     fi
     type $_compiler && echo "install successfully"
@@ -42,12 +42,12 @@ install_pkg(){
     echo "Try to install the $pkg"
     system_idebtify
     p=$?
-    if (( $p=1 ));then
-        pacman -S $pkg| echo "install failure"
-    elif (( $p=2 ));then
+    if (( $p==1 ));then
+        pacman -S $pkg || echo "install failure"
+    elif (( $p==2 ));then
         yum -y install $pkg || echo "install failure"
-    elif (( $p=3 ));then 
-        sudo apt install $pkg || echo "install failure"
+    elif (( $p==3 ));then 
+        sudo apt install $pkg -y || echo "install failure"
     fi
     type $pkg && echo "install successfully"
 }

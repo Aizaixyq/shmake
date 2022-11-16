@@ -1,4 +1,3 @@
-set -o errexit
 source ~/.shmake/.sh/linux_sh/config.sh
 source ~/.shmake/.sh/linux_sh/deps_tools.sh
 
