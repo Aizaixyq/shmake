@@ -6,7 +6,13 @@
 #include <cstring>
 #include <fstream>
 
-int linux_start(int argc, char *argv[]) {
+int task(const char *__command, bool sh){
+    if(sh) 
+        return system(("~/.shmake/.sh/linux_sh/" + std::string(__command)).data());
+    return system(__command);
+}
+
+int start(int argc, char *argv[]) {
     if (argc == 1) {
         int status = system("~/.shmake/.sh/linux_sh/build.sh \
             . --rebuild n --all y --jobs 16 --target sh*.sh");

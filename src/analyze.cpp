@@ -6,11 +6,10 @@
 #include <cstring>
 #include <string>
 
-extern int jobs;
 
 bool path_check(char *path){
     int status = 
-        system(("~/.shmake/.sh/linux_sh/fun.sh path_check " + std::string(path)).data());
+        task(("fun.sh path_check " + std::string(path)).data(), true);
     return error(status);
 }
 
@@ -77,10 +76,10 @@ int analyze(int argc, char *argv[]) {
         }
     }
     int status =
-        system(("~/.shmake/.sh/linux_sh/build.sh  \
+        task(("~/.shmake/.sh/linux_sh/build.sh  \
             " + path +" --rebuild " +
                 r + " --all " + a + " --jobs " + job + " --target " + target)
-                   .data());
+                   .data(), true);
     error(status);
     return 0;
 }

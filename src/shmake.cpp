@@ -1,6 +1,4 @@
-#include "linux.hpp"
-
-int main(int argc, char *argv[]) {
+#include "shmake.hpp"
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 // define something for Windows (32-bit and 64-bit, this part is common)
@@ -22,7 +20,8 @@ int main(int argc, char *argv[]) {
 #endif
 #elif __linux__
     // linux
-    return linux_start(argc, argv);
+    #include <unistd.h>
+    int jobs = sysconf(_SC_NPROCESSORS_ONLN);
 #elif __unix__ // all unices not caught above
 // Unix
 #elif defined(_POSIX_VERSION)
@@ -30,4 +29,7 @@ int main(int argc, char *argv[]) {
 #else
 #error "Unknown platform"
 #endif
+
+int main(int argc, char *argv[]) {
+    return start(argc, argv);
 }

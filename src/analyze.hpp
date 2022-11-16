@@ -3,6 +3,4 @@
 
 int analyze(int argc, char *argv[]);
 
-extern int jobs;
-
 #endif

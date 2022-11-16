@@ -6,7 +6,7 @@ path_check(){
     then
         return 1
     fi
-    return 0;
+    return 0
 }
 
 install(){

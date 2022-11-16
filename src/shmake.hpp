@@ -1,9 +1,6 @@
 #ifndef _SHMAKE_H_
 #define _SHMAKE_H_ 1
 
-int main();
-
-
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 // define something for Windows (32-bit and 64-bit, this part is common)
 #ifdef _WIN64
@@ -24,8 +21,7 @@ int main();
 #endif
 #elif __linux__
     // linux
-    #include <unistd.h>
-    int jobs = sysconf(_SC_NPROCESSORS_ONLN);
+    #include "linux.hpp"
 #elif __unix__ // all unices not caught above
 // Unix
 #elif defined(_POSIX_VERSION)
@@ -33,5 +29,7 @@ int main();
 #else
 #error "Unknown platform"
 #endif
+
+extern int jobs ;
 
 #endif

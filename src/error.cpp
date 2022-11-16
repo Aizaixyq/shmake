@@ -1,10 +1,11 @@
 #include "error.hpp"
+#include "shmake.hpp"
 #include <cstdio>
 #include <stdlib.h>
 
 int error(int status) {
     if (status == -1 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-        system("printf \"\\e[31m\"");
+        task("printf \"\\e[31m\"", false);
         if (status == -1)
             printf("system error!\n");
 
@@ -17,7 +18,7 @@ int error(int status) {
 
         printf("run error: [0x%x] [%d] [%d]\n", status, WIFEXITED(status),
                    WEXITSTATUS(status));
-        system("printf \"\\e[0m\"");
+        task("printf \"\\e[0m\"", false);
         return 0;
     }
     return 1;

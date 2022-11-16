@@ -1,5 +1,17 @@
-source ~/.shmake/.sh/linux_sh/config.sh
 set -o errexit
+source ~/.shmake/.sh/linux_sh/config.sh
+source ~/.shmake/.sh/linux_sh/deps_tools.sh
+
+if test -d ./rec 
+then
+    echo "检测脚本记录"
+else
+    mkdir rec && echo "创建脚本记录"
+fi 
+
+type pkg-config &>>./rec/build_rec.txt \
+    &&  echo "`date` pkg-config found." >> ./rec/build_rec.txt \
+    || ( echo "`date` pkg-config not found." >> ./rec/build_rec.txt && install_pkg )
 
 build_file_path=$1
 rebuild=$3
@@ -43,12 +55,11 @@ checkque() {
 for build in `ls ${build_file_path}/${build_file}`
 do
     source $build
-    if test -d ./rec 
-    then
-        echo "检测脚本记录"
-    else
-        mkdir rec && echo "创建脚本记录"
-    fi 
+
+    type $compiler &>>./rec/build_rec.txt \
+        &&  echo "`date` $compiler found." >> ./rec/build_rec.txt \
+        || ( echo "`date` $compiler not found." >> ./rec/build_rec.txt && install_compiler $compiler )    
+
     type before_build &>./rec/before_build.txt \
         && ( echo "before_build() found." > ./rec/before_build.txt && before_build ) \
         || echo "before_build() not found." > ./rec/before_build.txt 
@@ -134,10 +145,12 @@ do
 
                 if [[ $(cat ./Shfile/time/${src:${idex}}${idex}com.txt) != $(cat ./Shfile/time/${src:${idex}}${idex}.txt) ]]
                 then
-                    echo -e "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
+                    
+                    printf "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
                     ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
                         -MMD -MF Shfile/.d/${src:${idex}}${idex}.d \
-                        $all_include || exit 1
+                        $all_include || printf "\n"
+                    printf "✔️\n"
                     let "cnt++"
                 fi
 
@@ -145,10 +158,11 @@ do
                 mv -f ./Shfile/time/${src:${idex}}${idex}com.txt ./Shfile/time/${src:${idex}}${idex}.txt 
         
             else
-                echo -e "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
+                printf "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
                 ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
                     -MMD -MF Shfile/.d/${src:${idex}}${idex}.d \
-                    $all_include || exit 1
+                    $all_include || printf "\n"
+                printf "✔️\n"
                 let "cnt++"
                 echo `stat --format=%y ${scc}` >> ./Shfile/time/${src:${idex}}${idex}.txt
             fi
@@ -193,10 +207,11 @@ do
                 let "int--"
             done
 
-            echo -e "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
+            printf "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
             ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
                 -MMD -MF Shfile/.d/${src:${idex}}${idex}.d \
-                $all_include
+                $all_include || printf "\n"
+            printf "✔️\n"
             let "cnt++"
 
             all_o="${all_o} Shfile/.o/${src:${idex}}${idex}.o"

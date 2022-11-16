@@ -1,4 +1,5 @@
 #include "sh_string.hpp"
+#include "shmake.hpp"
 #include <string>
 
 void newsh_fun(std::string &x){
@@ -11,13 +12,13 @@ compiler="g++"
 }
 
 void show_version(){
-    system("printf \"shmake version: \\e[35m0.43.13\\e[0m\n\"");
+    task("printf \"shmake version: \\e[35m0.5.1\\e[0m\n\"", false);
 }
 
 void print_help(){
-    const std::string help = R"(shmake version: 0.43.13
-
-👉: $\e[36mshmake [Actions] [options] [target]\e[0m
+    show_version();
+    const std::string help = R"(
+👉 $\e[36mshmake [Actions] [options] [target]\e[0m
 
 Actions:
     \e[35mcreate         \e[0mCreate a new sh.sh file. (Project name)
@@ -36,5 +37,5 @@ Command options (build):
                     Will rename the default file(sh.sh) to sh*.sh
         \e[32mtarget     \e[0mRename the default file (sh.sh)
 )";
-    system(("printf \"" + help + "\"").data());
+    task(("printf \"" + help + "\"").data(), false);
 }
