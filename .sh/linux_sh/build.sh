@@ -88,19 +88,7 @@ do
         cp Shfile/pch/*.pch ${build_file_path}/${pch_header%/*}
     fi
 
-    i=${#build}
-    ix=0
-    while(( $i>=0 ))
-    do
-        s=${build:${i}:1}
-        if [[ $s = "/" ]]
-        then
-            ix=`expr ${i} + 1`
-            break
-        fi
-        let "i--"
-    done
-    build_time=${build:${ix}}
+    build_time=${build##*/}
 
     all_include=""
     for src in ${includedir[@]}
@@ -123,35 +111,24 @@ do
         echo `stat --format=%y $build` > ./rec/${build_time}.txt
     fi
 
+    all_o=""
     if [[ -d ./Shfile ]] && [[ $rebuild = "n" ]] && \
         [[ $(cat ./rec/${build_time}com.txt) = $(cat ./rec/${build_time}.txt) ]]
     then 
-        rm ./rec/${build_time}.txt
-        mv -f ./rec/${build_time}com.txt ./rec/${build_time}.txt
-        all_o=""
+
         cnt=1
 
         for src in $src_
         do 
-            int=${#src}
-            idex=0
-            while(( $int>=0 ))
-            do
-                s=${src:${int}:1}
-                if [[ $s = "/" ]]
-                then
-                    idex=`expr ${int} + 1`
-                    break
-                fi
-                let "int--"
-            done
+            
+            name=${src##*/}
 
-            all_o="${all_o} Shfile/.o/${src:${idex}}${idex}.o"
+            all_o="${all_o} Shfile/.o/${name}.o"
 
-            if [ -f ./Shfile/.d/${src:${idex}}${idex}.d ]
+            if [ -f ./Shfile/.d/${name}.d ]
             then
                 ptr=1
-                for sc in $(cat ./Shfile/.d/${src:${idex}}${idex}.d)
+                for sc in $(cat ./Shfile/.d/${name}.d)
                 do
                     if (( $ptr == 1 ))
                     then 
@@ -164,31 +141,31 @@ do
                     then 
                         continue
                     fi
-                    echo `stat --format=%y ${scc}` >> ./Shfile/time/${src:${idex}}${idex}com.txt
+                    echo `stat --format=%y ${scc}` >> ./Shfile/time/${name}com.txt
                 done
 
-                if [[ $(cat ./Shfile/time/${src:${idex}}${idex}com.txt) != $(cat ./Shfile/time/${src:${idex}}${idex}.txt) ]]
+                if [[ $(cat ./Shfile/time/${name}com.txt) != $(cat ./Shfile/time/${name}.txt) ]]
                 then
                     
-                    printf "\e[36m[${cnt}]\e[33m${src:${idex}}"
-                    ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
-                        -MMD -MF Shfile/.d/${src:${idex}}${idex}.d \
+                    printf "\e[36m[${cnt}]\e[33m${src##*/}"
+                    ${compiler}  ${src} -c -o Shfile/.o/${name}.o \
+                        -MMD -MF Shfile/.d/${name}.d \
                         $all_include ${pch_} || printf "\n\e[0m"
                     echo -e "\e[32m ✔️\e[0m"
                     let "cnt++"
                 fi
 
-                rm ./Shfile/time/${src:${idex}}${idex}.txt 
-                mv -f ./Shfile/time/${src:${idex}}${idex}com.txt ./Shfile/time/${src:${idex}}${idex}.txt 
+                rm ./Shfile/time/${name}.txt 
+                mv -f ./Shfile/time/${name}com.txt ./Shfile/time/${name}.txt 
         
             else
-                printf "\e[36m[${cnt}]\e[33m${src:${idex}}"
-                ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
-                    -MMD -MF Shfile/.d/${src:${idex}}${idex}.d \
+                printf "\e[36m[${cnt}]\e[33m${src##*/}"
+                ${compiler}  ${src} -c -o Shfile/.o/${name}.o \
+                    -MMD -MF Shfile/.d/${name}.d \
                     $all_include ${pch_} || printf "\n\e[0m"
                 echo -e "\e[32m ✔️\e[0m"
                 let "cnt++"
-                echo `stat --format=%y ${scc}` >> ./Shfile/time/${src:${idex}}${idex}.txt
+                echo `stat --format=%y ${scc}` >> ./Shfile/time/${name}.txt
             fi
             printf "" & #Multiple thread
             PID=$!
@@ -202,8 +179,7 @@ do
         wait
 
     else
-        rm ./rec/${build_time}.txt
-        mv -f ./rec/${build_time}com.txt ./rec/${build_time}.txt
+        
         if [[ ! -d ./Shfile ]]
         then
             mkdir Shfile && mkdir Shfile/.d && mkdir Shfile/.o \
@@ -215,30 +191,18 @@ do
         for src in $src_
         do 
 
-            int=${#src}
-            idex=0
-            while(( $int>=0 ))
-            do
-                s=${src:${int}:1}
-                if [[ $s = "/" ]]
-                then
-                    idex=`expr ${int} + 1`
-                    break
-                fi
-                let "int--"
-            done
+            name=${src##*/}
+            all_o="${all_o} Shfile/.o/${name}.o"
 
-            printf "\e[36m[${cnt}]\e[33m${src:${idex}}"
-            ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
-                -MMD -MF Shfile/.d/${src:${idex}}${idex}.d \
+            printf "\e[36m[${cnt}]\e[33m${src##*/}"
+            ${compiler}  ${src} -c -o Shfile/.o/${name}.o \
+                -MMD -MF Shfile/.d/${name}.d \
                 $all_include ${pch_} || printf "\n\e[0m"
             echo -e "\e[32m ✔️\e[0m"
             let "cnt++"
 
-            all_o="${all_o} Shfile/.o/${src:${idex}}${idex}.o"
-
             ptr=1
-            for sc in $(cat ./Shfile/.d/${src:${idex}}${idex}.d)
+            for sc in $(cat ./Shfile/.d/${name}.d)
             do
                 if (( $ptr == 1 ))
                 then 
@@ -251,7 +215,7 @@ do
                 then 
                     continue
                 fi
-                echo `stat --format=%y ${scc}` >> ./Shfile/time/${src:${idex}}${idex}.txt
+                echo `stat --format=%y ${scc}` >> ./Shfile/time/${name}.txt
             done
             printf "" & #Multiple thread
             PID=$!
@@ -269,7 +233,10 @@ do
         ${pkg_tool} ${cflags[*]} ${pch_} \
         && echo -e "\e[32mBuilding completed\e[0m" || exit 1
 
-    rm -rf ${build_file_path}/${name_pch%%*/} ${build_file_path}/${pch_header%/*}/*.pch
+    rm -rf ${build_file_path}/${pch_header%/*}/*.pch
+
+    rm ./rec/${build_time}.txt
+    mv -f ./rec/${build_time}com.txt ./rec/${build_time}.txt
 
 
     type after_build &> ./rec/after_build.txt \
