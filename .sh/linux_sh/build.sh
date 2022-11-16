@@ -54,7 +54,7 @@ checkque() {
 for build in `ls ${build_file_path}/${build_file}`
 do
     source $build
-
+    set -o errexit
     type $compiler &>>./rec/build_rec.txt \
         &&  echo "`date` $compiler found." >> ./rec/build_rec.txt \
         || ( echo "`date` $compiler not found." >> ./rec/build_rec.txt && install_compiler $compiler )    
