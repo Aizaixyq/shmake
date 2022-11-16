@@ -4,9 +4,9 @@ source ~/.shmake/.sh/linux_sh/deps_tools.sh
 
 if test -d ./rec 
 then
-    echo "检测脚本记录"
+    echo "Reloading..."
 else
-    mkdir rec && echo "创建脚本记录"
+    mkdir rec && echo "Loading..."
 fi 
 
 type pkg-config &>>./rec/build_rec.txt \
@@ -63,6 +63,30 @@ do
     type before_build &>./rec/before_build.txt \
         && ( echo "`date` before_build() found." > ./rec/before_build.txt && before_build ) \
         || echo "`date` before_build() not found." > ./rec/before_build.txt 
+
+    pkg_tool=""
+    if [[ ${deps} = "" ]]
+    then
+        pkg_tool=" "
+    else
+        pkg_tool="`pkg-config --libs --cflags ${deps[*]}`"
+    fi
+
+    pch_=""
+    if [[ ${pch_header} = "" ]]
+    then
+        pch_=" "
+    else
+        cp ${build_file_path}/${pch_header} Shfile/pch/
+        if [[ ${pch_header} =~ ".hpp" ]];then
+            name_pch=`ls Shfile/pch/*.hpp`
+        else
+            name_pch=`ls Shfile/pch/*.h`
+        fi
+            
+        ${compiler} -c -o ${name_pch%.*}.pch $name_pch
+        cp Shfile/pch/*.pch ${build_file_path}/${pch_header%/*}
+    fi
 
     i=${#build}
     ix=0
@@ -149,7 +173,7 @@ do
                     printf "\e[36m[${cnt}]\e[33m${src:${idex}}"
                     ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
                         -MMD -MF Shfile/.d/${src:${idex}}${idex}.d \
-                        $all_include || printf "\n\e[0m"
+                        $all_include ${pch_} || printf "\n\e[0m"
                     echo -e "\e[32m ✔️\e[0m"
                     let "cnt++"
                 fi
@@ -161,7 +185,7 @@ do
                 printf "\e[36m[${cnt}]\e[33m${src:${idex}}"
                 ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
                     -MMD -MF Shfile/.d/${src:${idex}}${idex}.d \
-                    $all_include || printf "\n\e[0m"
+                    $all_include ${pch_} || printf "\n\e[0m"
                 echo -e "\e[32m ✔️\e[0m"
                 let "cnt++"
                 echo `stat --format=%y ${scc}` >> ./Shfile/time/${src:${idex}}${idex}.txt
@@ -177,16 +201,13 @@ do
         done
         wait
 
-        ${compiler} ${all_o} -o ${project[0]} \
-            `pkg-config --libs --cflags ${deps[*]}` \
-            && echo -e "\e[32mBuilding completed\e[0m" || exit 1
     else
         rm ./rec/${build_time}.txt
         mv -f ./rec/${build_time}com.txt ./rec/${build_time}.txt
         if [[ ! -d ./Shfile ]]
         then
             mkdir Shfile && mkdir Shfile/.d && mkdir Shfile/.o \
-                && mkdir Shfile/time 
+                && mkdir Shfile/time && mkdir Shfile/pch
         fi
 
         cnt=1
@@ -210,7 +231,7 @@ do
             printf "\e[36m[${cnt}]\e[33m${src:${idex}}"
             ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
                 -MMD -MF Shfile/.d/${src:${idex}}${idex}.d \
-                $all_include || printf "\n\e[0m"
+                $all_include ${pch_} || printf "\n\e[0m"
             echo -e "\e[32m ✔️\e[0m"
             let "cnt++"
 
@@ -243,10 +264,12 @@ do
         done
         wait
 
-        ${compiler} ${all_o} -o ${project[0]} \
-            `pkg-config --libs --cflags ${deps[*]}` \
-            && echo -e "\e[32mBuilding completed\e[0m" || exit 1
     fi
+    ${compiler} ${all_o} -o ${project[0]} \
+        ${pkg_tool} ${cflags[*]} ${pch_} \
+        && echo -e "\e[32mBuilding completed\e[0m" || exit 1
+
+    rm -rf ${build_file_path}/${name_pch%%*/} ${build_file_path}/${pch_header%/*}/*.pch
 
 
     type after_build &> ./rec/after_build.txt \

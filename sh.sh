@@ -1,5 +1,6 @@
 project=("shmake")
 sources=("src/*.cpp")
 includedir=("src")
-deps=()
+deps=("fmt")
 compiler="g++"
+cflags=("-Wall") 
