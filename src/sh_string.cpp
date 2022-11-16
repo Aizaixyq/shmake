@@ -12,7 +12,7 @@ compiler="g++"
 }
 
 void show_version(){
-    task("printf \"shmake version: \\e[35m0.5.3\\e[0m\n\"", false);
+    task("printf \"shmake version: \\e[35m0.5.31\\e[0m\n\"", false);
 }
 
 void print_help(){
