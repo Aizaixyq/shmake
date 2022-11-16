@@ -76,9 +76,9 @@ int analyze(int argc, char *argv[]) {
         }
     }
     int status =
-        task(("~/.shmake/.sh/linux_sh/build.sh  \
-            " + path +" --rebuild " +
-                r + " --all " + a + " --jobs " + job + " --target " + target)
+        task(("build.sh  \
+            " + path +" --rebuild " + r + " --all " + a + 
+            " --jobs " + job + " --target " + target)
                    .data(), true);
     error(status);
     return 0;

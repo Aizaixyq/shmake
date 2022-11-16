@@ -1,6 +1,6 @@
 build_file_path="."
 build_file="sh.sh"
 compiler="clang++"
-jobs=4
+jobs=16
 pch="n"
 pch_header=()

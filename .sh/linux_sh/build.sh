@@ -61,8 +61,8 @@ do
         || ( echo "`date` $compiler not found." >> ./rec/build_rec.txt && install_compiler $compiler )    
 
     type before_build &>./rec/before_build.txt \
-        && ( echo "before_build() found." > ./rec/before_build.txt && before_build ) \
-        || echo "before_build() not found." > ./rec/before_build.txt 
+        && ( echo "`date` before_build() found." > ./rec/before_build.txt && before_build ) \
+        || echo "`date` before_build() not found." > ./rec/before_build.txt 
 
     i=${#build}
     ix=0
@@ -146,11 +146,11 @@ do
                 if [[ $(cat ./Shfile/time/${src:${idex}}${idex}com.txt) != $(cat ./Shfile/time/${src:${idex}}${idex}.txt) ]]
                 then
                     
-                    printf "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
+                    printf "\e[36m[${cnt}]\e[33m${src:${idex}}"
                     ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
                         -MMD -MF Shfile/.d/${src:${idex}}${idex}.d \
-                        $all_include || printf "\n"
-                    printf "✔️\n"
+                        $all_include || printf "\n\e[0m"
+                    echo -e "\e[32m ✔️\e[0m"
                     let "cnt++"
                 fi
 
@@ -158,11 +158,11 @@ do
                 mv -f ./Shfile/time/${src:${idex}}${idex}com.txt ./Shfile/time/${src:${idex}}${idex}.txt 
         
             else
-                printf "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
+                printf "\e[36m[${cnt}]\e[33m${src:${idex}}"
                 ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
                     -MMD -MF Shfile/.d/${src:${idex}}${idex}.d \
-                    $all_include || printf "\n"
-                printf "✔️\n"
+                    $all_include || printf "\n\e[0m"
+                echo -e "\e[32m ✔️\e[0m"
                 let "cnt++"
                 echo `stat --format=%y ${scc}` >> ./Shfile/time/${src:${idex}}${idex}.txt
             fi
@@ -207,11 +207,11 @@ do
                 let "int--"
             done
 
-            printf "\e[36m[${cnt}]\e[33m${src:${idex}}\e[0m"
+            printf "\e[36m[${cnt}]\e[33m${src:${idex}}"
             ${compiler}  ${src} -c -o Shfile/.o/${src:${idex}}${idex}.o \
                 -MMD -MF Shfile/.d/${src:${idex}}${idex}.d \
-                $all_include || printf "\n"
-            printf "✔️\n"
+                $all_include || printf "\n\e[0m"
+            echo -e "\e[32m ✔️\e[0m"
             let "cnt++"
 
             all_o="${all_o} Shfile/.o/${src:${idex}}${idex}.o"
@@ -250,7 +250,8 @@ do
 
 
     type after_build &> ./rec/after_build.txt \
-        && ( echo "after_build() found." > ./rec/after_build.txt && after_build ) \
-        || echo "after_build() not found." > ./rec/after_build.txt
-    echo -e "\e[35mrunning time estimate: $SECONDS seconds\e[0m"
+        && ( echo "`date` after_build() found." > ./rec/after_build.txt && after_build ) \
+        || echo "`date` after_build() not found." > ./rec/after_build.txt
+    echo -e "\e[35mRunning time estimate: $SECONDS seconds\e[0m"
 done
+exit
