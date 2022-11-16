@@ -11,20 +11,23 @@ compiler="g++"
 }
 
 void show_version(){
-    system("printf \"shmake version: \\e[35m0.43.11\\e[0m\n\"");
+    system("printf \"shmake version: \\e[35m0.43.13\\e[0m\n\"");
 }
 
 void print_help(){
-    const std::string help = R"(shmake version: 0.43.11
+    const std::string help = R"(shmake version: 0.43.13
 
-Usage: $\e[36mshmake [Actions] [options] [target]\e[0m
+👉: $\e[36mshmake [Actions] [options] [target]\e[0m
 
 Actions:
     \e[35mcreate         \e[0mCreate a new sh.sh file. (Project name)
     \e[35mr, run         \e[0mRun the project target. (Project name)
     \e[35mb, build       \e[0mBuild all targets if no given tasks. (file name)
     \e[35mc, clean       \e[0mRemove all binary and temporary files.
-    \e[35m-v, version    \e[0mShow your shmake tool version.
+
+Command Options:
+    \e[35m-v, --version  \e[0mShow your shmake tool version.
+    \e[35m-h, --help     \e[0mPrint this help message and exit.
 
 Command options (build):
     \e[32m-r, --rebuild  \e[0mRebuild the target.
