@@ -17,8 +17,7 @@ void show_version(){
 
 void print_help(){
     show_version();
-    const std::string help = R"(
-👉 $\e[36mshmake [Actions] [options] [target]\e[0m
+    const std::string help = R"(👉 $\e[36mshmake [Actions] [options] [target]\e[0m
 
 Actions:
     \e[35mcreate         \e[0mCreate a new sh.sh file. (Project name)
