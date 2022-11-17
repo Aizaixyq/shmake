@@ -4,13 +4,15 @@ system_idebtify(){
     b="Arch"
     c="Centos"
     d="Ubuntu"
+    e="Debian"
     ret=0
 
     if [[ $a =~ $b ]];then
         ret=1
     elif [[ $a =~ $c ]];then
         ret=2
-    elif [[ $a =~ $d ]];then
+    elif [[ $a =~ $d ]] || [[ $a =~ $e ]]
+    then
         ret=3
     else
         echo $a
@@ -27,6 +29,7 @@ install_compiler(){
     echo "Try to install the compiler: $1"
     system_idebtify
     p=$?
+    sudo apt update
     if (( $p==1 ));then
         pacman -S $_compiler || echo "install failure"
     elif (( $p==2 ));then
@@ -42,6 +45,7 @@ install_pkg(){
     echo "Try to install the $pkg"
     system_idebtify
     p=$?
+    sudo apt update
     if (( $p==1 ));then
         pacman -S $pkg || echo "install failure"
     elif (( $p==2 ));then
