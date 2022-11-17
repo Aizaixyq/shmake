@@ -7,6 +7,12 @@ void newsh_fun(std::string &x){
 includedir=()
 deps=()
 compiler="g++"
+#project=("shmake")
+#sources=("src/*.cpp")
+#includedir=("src")
+#deps=("fmt")
+#compiler="g++"
+#cflags=("-Wall") 
 )";
     x = newsh;
 }
