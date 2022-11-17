@@ -77,6 +77,8 @@ do
         all_include="${all_include} -I ${build_file_path}/${src} "
     done
 
+    cnt=1
+
     pch=""
     if [[ ${pch_header} = "" ]]
     then
@@ -92,6 +94,7 @@ do
             name_pch=`ls pch/*.h`
         fi
             
+        printf "\e[36m[${cnt}]\e[33m${pch_header##*/}"
         if [[ ${compiler} = "gcc" ]] || [[ ${compiler} = "g++" ]]
         then
             ${compiler} -o ${name_pch}.gch -c $name_pch ${all_include}
@@ -102,6 +105,8 @@ do
             ${compiler} -o ${name_pch}.pch -c $name_pch ${all_include}
             pch_=" -include-pch ${name_pch}.pch "
         fi
+        echo -e "\e[32m ✔️\e[0m"
+        let "cnt++"
     fi
 
     build_time=${build##*/}
@@ -112,6 +117,10 @@ do
     do  
         src_="$src_ `ls ${build_file_path}/$s`"
     done
+
+    if [[ ! -d ./${mode} ]];then
+        mkdir ./$mode
+    fi
 
     if [ -f ./rec/${build_time}.txt ]
     then
@@ -126,8 +135,6 @@ do
     if [[ -d ./Shfile ]] && [[ $rebuild = "n" ]] && \
         [[ $(cat ./rec/${build_time}com.txt) = $(cat ./rec/${build_time}.txt) ]]
     then 
-
-        cnt=1
 
         for src in $src_
         do 
@@ -155,7 +162,7 @@ do
                     printf "\e[36m[${cnt}]\e[33m${src##*/}"
                     ${compiler}  ${src} -c -o Shfile/.o/${name}.o \
                         -MMD -MF Shfile/.d/${name}.d \
-                        $all_include ${pch_} || printf "\n\e[0m"
+                        $all_include ${pch_} ${cflags[*]} || printf "\n\e[0m"
                     echo -e "\e[32m ✔️\e[0m"
                     let "cnt++"
                 fi
@@ -167,7 +174,7 @@ do
                 printf "\e[36m[${cnt}]\e[33m${src##*/}"
                 ${compiler}  ${src} -c -o Shfile/.o/${name}.o \
                     -MMD -MF Shfile/.d/${name}.d \
-                    $all_include ${pch_} || printf "\n\e[0m"
+                    $all_include ${pch_} ${cflags[*]} || printf "\n\e[0m"
                 echo -e "\e[32m ✔️\e[0m"
                 let "cnt++"
                 echo `stat --format=%y ${scc}` >> ./Shfile/time/${name}.txt
@@ -191,8 +198,6 @@ do
                 && mkdir Shfile/time
         fi
 
-        cnt=1
-
         for src in $src_
         do 
 
@@ -202,7 +207,7 @@ do
             printf "\e[36m[${cnt}]\e[33m${src##*/}"
             ${compiler}  ${src} -c -o Shfile/.o/${name}.o \
                 -MMD -MF Shfile/.d/${name}.d \
-                $all_include ${pch_} || printf "\n\e[0m"
+                $all_include ${pch_} ${cflags[*]} || printf "\n\e[0m"
             echo -e "\e[32m ✔️\e[0m"
             let "cnt++"
 
@@ -230,7 +235,7 @@ do
         wait
 
     fi
-    ${compiler} ${all_o} -o ${project[0]} \
+    ${compiler} ${all_o} -o ${mode}/${project[0]} \
         ${pkg_tool} ${cflags[*]} \
         && echo -e "\e[32mBuilding completed\e[0m" || exit 1
 

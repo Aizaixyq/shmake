@@ -3,6 +3,7 @@ build_file="sh.sh"
 compiler="clang++"
 jobs=16
 pch_header=""
+mode="release"
 cflags=()
 project=()
 sources=()
