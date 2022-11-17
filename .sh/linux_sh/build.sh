@@ -71,29 +71,41 @@ do
         pkg_tool="`pkg-config --libs --cflags ${deps[*]}`"
     fi
 
-    pch_=""
-    if [[ ${pch_header} = "" ]]
-    then
-        pch_=" "
-    else
-        cp ${build_file_path}/${pch_header} Shfile/pch/
-        if [[ ${pch_header} =~ ".hpp" ]];then
-            name_pch=`ls Shfile/pch/*.hpp`
-        else
-            name_pch=`ls Shfile/pch/*.h`
-        fi
-            
-        ${compiler} -c -o ${name_pch%.*}.pch $name_pch
-        cp Shfile/pch/*.pch ${build_file_path}/${pch_header%/*}
-    fi
-
-    build_time=${build##*/}
-
     all_include=""
     for src in ${includedir[@]}
     do
         all_include="${all_include} -I ${build_file_path}/${src} "
     done
+
+    pch=""
+    if [[ ${pch_header} = "" ]]
+    then
+        pch=" "
+    else
+        if [[ ! -d ./pch ]];then
+            mkdir pch
+        fi
+        cp ${build_file_path}/${pch_header} pch/
+        if [[ ${pch_header} =~ ".hpp" ]];then
+            name_pch=`ls pch/*.hpp`
+        else
+            name_pch=`ls pch/*.h`
+        fi
+            
+        if [[ ${compiler} = "gcc" ]] || [[ ${compiler} = "g++" ]]
+        then
+            ${compiler} -o ${name_pch}.gch -c $name_pch ${all_include}
+            cp pch/*.gch ${build_file_path}/${pch_header%/*}
+            pch_=" -include ${build_file_path}/${pch_header} "
+        elif [[ ${compiler} = "clang" ]] || [[ ${compiler} = "clang++" ]]
+        then
+            ${compiler} -o ${name_pch}.pch -c $name_pch ${all_include}
+            pch_=" -include-pch ${name_pch}.pch "
+        fi
+    fi
+
+    build_time=${build##*/}
+
 
     src_=""
     for s in ${sources[@]}
@@ -129,18 +141,12 @@ do
                 ptr=1
                 for sc in $(cat ./Shfile/.d/${name}.d)
                 do
-                    if (( $ptr == 1 ))
+                    if (( $ptr == 1 )) || [[ $sc = "\\" ]] || [[ ${sc#${build_file_path}} = $sc ]]
                     then 
                         let "ptr++"
                         continue
-                    else
-                        scc=$sc
-                    fi
-                    if [[ $scc = "\\" ]]
-                    then 
-                        continue
-                    fi
-                    echo `stat --format=%y ${scc}` >> ./Shfile/time/${name}com.txt
+                    fi  
+                    echo `stat --format=%y ${sc}` >> ./Shfile/time/${name}com.txt
                 done
 
                 if [[ $(cat ./Shfile/time/${name}com.txt) != $(cat ./Shfile/time/${name}.txt) ]]
@@ -182,7 +188,7 @@ do
         if [[ ! -d ./Shfile ]]
         then
             mkdir Shfile && mkdir Shfile/.d && mkdir Shfile/.o \
-                && mkdir Shfile/time && mkdir Shfile/pch
+                && mkdir Shfile/time
         fi
 
         cnt=1
@@ -200,21 +206,17 @@ do
             echo -e "\e[32m ✔️\e[0m"
             let "cnt++"
 
+
+            rm -rf ./Shfile/time/${name}.txt
             ptr=1
             for sc in $(cat ./Shfile/.d/${name}.d)
             do
-                if (( $ptr == 1 ))
+                if (( $ptr == 1 )) || [[ $sc = "\\" ]] || [[ ${sc#${build_file_path}} = $sc ]]
                 then 
                     let "ptr++"
                     continue
-                else
-                    scc=$sc
-                fi
-                if [[ $scc = "\\" ]]
-                then 
-                    continue
-                fi
-                echo `stat --format=%y ${scc}` >> ./Shfile/time/${name}.txt
+                fi  
+                echo `stat --format=%y ${sc}` >> ./Shfile/time/${name}.txt   
             done
             printf "" & #Multiple thread
             PID=$!
@@ -229,10 +231,10 @@ do
 
     fi
     ${compiler} ${all_o} -o ${project[0]} \
-        ${pkg_tool} ${cflags[*]} ${pch_} \
+        ${pkg_tool} ${cflags[*]} \
         && echo -e "\e[32mBuilding completed\e[0m" || exit 1
 
-    rm -rf ${build_file_path}/${pch_header%/*}/*.pch
+    rm -rf ${build_file_path}/${pch_header%/*}/*.pch ${build_file_path}/${pch_header%/*}/*.gch
 
     rm ./rec/${build_time}.txt
     mv -f ./rec/${build_time}com.txt ./rec/${build_time}.txt
