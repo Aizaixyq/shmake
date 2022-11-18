@@ -1,4 +1,4 @@
-
+#!/bin/bash
 path_check(){
     path_c=`ls $1`
 
