@@ -12,3 +12,4 @@ rm -rf ~/.shmake/.sh
 cp  -r ./.sh ~/.shmake
 
 sudo cp -f ./shmake /usr/local/bin && echo "successful"
+rm -f ./shmake
