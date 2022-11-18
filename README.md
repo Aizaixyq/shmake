@@ -8,6 +8,7 @@ A flexible build tool built using a shell is available for linux
 
 ## Install
     $ git clone https://github.com/Aizaixyq/shmake.git
+    $ cd shmake
     $ sh install.sh
 
 ## Build

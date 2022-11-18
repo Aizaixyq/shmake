@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 g++ ./src/*.cpp -o shmake
 

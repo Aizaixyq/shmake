@@ -24,5 +24,17 @@ install(){
     cp build.sh /home/fei-chen/.shmake
 }
 
+run(){
+    for file in `ls $1`
+    do  
+        if [[ -x $1/$file ]] && [[ ${file%.*} = ${file} ]] && [[ ! -d $1/$file ]]
+        then
+            ./$1/$file
+        elif [[ -d $1/$file ]]
+        then
+            run $1/$file
+        fi
+    done
+}
 
 ${1} ${2}

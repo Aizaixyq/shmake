@@ -52,7 +52,13 @@ int start(int argc, char *argv[]) {
             print_help();
         }
 
-        else if (!strcmp(argv[1], "r") || !strcmp(argv[1], "run")) {
+        else if (!strcmp(argv[1], "r")) {
+            int status =
+                task("fun.sh run . ", true);
+            error(status);
+        }
+
+        else if (!strcmp(argv[1], "run")) {
             int status =
                 system((std::string("./") + std::string(argv[2])).data());
             error(status);
