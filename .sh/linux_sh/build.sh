@@ -119,8 +119,11 @@ do
         src_="$src_ `ls ${build_file_path}/$s`"
     done
 
-    if [[ ! -d ./${mode} ]];then
-        mkdir ./$mode
+    if [[ ! -d ./mode ]];then
+        mkdir ./mode
+    fi
+    if [[ ! -d ./mode/${mode} ]];then
+        mkdir ./mode/$mode
     fi
 
     if [ -f ./rec/${build_time}.txt ]
@@ -236,7 +239,7 @@ do
         wait
 
     fi
-    ${compiler} ${all_o} -o ${mode}/${project[0]} \
+    ${compiler} ${all_o} -o mode/${mode}/${project[0]} \
         ${pkg_tool} ${cflags[*]} \
         && echo -e "\e[32mBuilding completed\e[0m" || exit 1
 
