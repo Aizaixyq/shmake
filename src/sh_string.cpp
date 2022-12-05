@@ -3,22 +3,21 @@
 #include <string>
 
 void newsh_fun(std::string &x){
-    std::string newsh = R"(sources=()
+    std::string newsh = R"(#compiler="clang++"
+#jobs=16
+#pch_header=""
+mode="release"
+cflags=()
+project=()
+sources=()
 includedir=()
 deps=()
-compiler="g++"
-#project=("shmake")
-#sources=("src/*.cpp")
-#includedir=("src")
-#deps=("fmt")
-#compiler="g++"
-#cflags=("-Wall") 
 )";
     x = newsh;
 }
 
 void show_version(){
-    task("printf \"shmake version:\\e[35m 1.0.2\\e[0m\n\"", false);
+    task("printf \"shmake version:\\e[35m 1.0.3\\e[0m\n\"", false);
 }
 
 void print_help(){
